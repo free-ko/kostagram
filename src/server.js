@@ -1,29 +1,18 @@
 require("dotenv").config();
-
-// graphql-yoga에서 GraphQLServer를 불러와야 합니다.
 import { GraphQLServer } from "graphql-yoga";
+import logger from "morgan";
+import schema from "./schema";
 
-// 서버를 만들어 보겠습니다.
-// dotenv config에서 포트를 읽어 오도록 .env 파일에 PORT를 추가 하면 됩니다.
-// 모든 설정 값을 env에 추가하는 건 좋은 습관 입니다.
 const PORT = process.env.PORT || 4000;
 
-// type 정의와 resolver들이 필요 합니다.
-const typeDefs = `
-    type Query{
-        hello: String!
-    }
-`;
+// server.express 라고 하면 express 서버에 접근 할 수 있습니다.
+// express 서버에서 logger 미들웨어를 사용하겠습니다.
+// 사실은 morgan 모듈 입니다.
+// 이렇게 미들웨어를 추가 하면 됩니다.
+const server = new GraphQLServer({ schema });
 
-const resolvers = {
-  Query: {
-    hello: () => "Hi",
-  },
-};
+server.express.use(logger("dev"));
 
-const server = new GraphQLServer({ typeDefs, resolvers });
-
-// server.start 함수를 추가 하겠습니다.
 server.start({ port: PORT }, () =>
-  console.log(`Server running on  http://localhost:${PORT}`)
+  console.log(`✅ Server running on http://localhost:${PORT}`)
 );
